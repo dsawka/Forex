@@ -45,7 +45,7 @@
                     {{ transaction.id }} {{transaction.timestamp}} {{ transaction.currency }} {{ transaction.sell_or_buy }} {{ transaction.bid }} {{ transaction.date_add }}
                     <form action="" method="POST">
                     {% csrf_token %}
-                         <button type="submit" name=NAME value="{{ transaction.id }}">Close</button>
+                         <button type="submit" name={{ transaction.id }} value="close">Close</button>
                     </form>
                     </p>
                     {% endfor %}

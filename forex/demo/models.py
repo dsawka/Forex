@@ -33,6 +33,7 @@ class DealModel(models.Model):
     low = models.FloatField()
     high = models.FloatField()
     open = models.FloatField()
+    result = models.DecimalField(null=True, max_digits=6, decimal_places=5)
 
     def __str__(self):
         return "%s, %s, %s" %(self.sell_or_buy, self.ask, self.bid)
