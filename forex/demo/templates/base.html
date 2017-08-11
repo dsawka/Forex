@@ -53,6 +53,7 @@
                     <p>
                     {% for transaction in transactions_closed %}
                     {{ transaction.id }} {{ transaction.currency }} {{ transaction.sell_or_buy }} {{ transaction.bid }} {{ transaction.date_add }}
+                        {% csrf_token %}
                     </p>
                     {% endfor %}
             </div>

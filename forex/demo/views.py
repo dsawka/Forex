@@ -91,6 +91,12 @@ class MainView(View):
 
 
 
+class TestView(View):
+
+    def get(self, request):
+        return TemplateResponse(request, 'test.html')
+
+
 
 
 

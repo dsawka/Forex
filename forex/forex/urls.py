@@ -18,10 +18,11 @@ from django.contrib import admin
 from demo import views
 from django.contrib.auth import views as auth_views
 
-from demo.views import MainView
+from demo.views import MainView, TestView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', MainView.as_view()),
+    url(r'^test/$', TestView.as_view()),
 
 ]
