@@ -1,4 +1,5 @@
 # Forex
+Forex Training Portal
 ## Description
 Forex demo account only for education purposes. Create your profil and trade on real, dealable interbank prices of forex major currency pairs.
 ## Built With
