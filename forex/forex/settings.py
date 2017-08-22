@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from django.core.urlresolvers import reverse_lazy
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -128,3 +129,33 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Login
+LOGIN_REDIRECT_URL = reverse_lazy('dashboard')
+LOGIN_URL = reverse_lazy('login')
+LOGOUT_URL = reverse_lazy('logout')
+
+# Redirect e-mails to shell
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Serve the media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+# Authentication
+AUTHENTICATION_BACKENDS = (
+    # 'social.backends.facebook.Facebook2OAuth2',
+    # 'social.backends.twitter.TwitterOAuth',
+    # 'social.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+    'demo.authentication.EmailAuthBackend',
+)
+
+# SOCIAL_AUTH_FACEBOOK_KEY = 'xxx' # Wartość App ID pobrana z serwisu Facebook.
+# SOCIAL_AUTH_FACEBOOK_SECRET = 'xxx' # Wartość App Secret pobrana z serwisu Facebook.
+#
+# SOCIAL_AUTH_TWITTER_KEY = 'xxx' # Wartość Consumer Key pobrana z serwisu Twitter.
+# SOCIAL_AUTH_TWITTER_SECRET = 'xxx' # Wartość Consumer Secret pobrana z serwisu Twitter.
+#
+# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'xxx.apps.googleusercontent.com' # Wartość Consumer Key pobrana z serwisu Google.
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'xxx' # Wartość Consumer Secret pobrana z serwisu Google.

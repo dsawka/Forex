@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', MainView.as_view()),
+    url(r'^test$', TestView.as_view()),
     url(r'^account/', include('demo.urls')),
     # Social authentication
     # url('social-auth/', include(social.apps.django_app.urls, namespace='social')),

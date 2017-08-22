@@ -1,13 +1,17 @@
 from django.db import models
+from django.conf import settings
+
 
 SELL_OR_BUY = (
-    ('sell' , 'sell'),
-    ('buy' , 'buy')
+    ('sell', 'sell'),
+    ('buy', 'buy')
 )
 OPEN_OR_CLOSED = (
     ('Open', 'OPEN'),
-    ('Closed','CLOSED')
+    ('Closed', 'CLOSED')
 )
+
+
 class DataModel(models.Model):
     date_add = models.DateTimeField(auto_now_add=True, db_index=True)
     timestamp = models.BigIntegerField(db_index=True)
@@ -19,7 +23,7 @@ class DataModel(models.Model):
     open = models.FloatField()
 
     def __str__(self):
-        return "%s Ask: %s Bid: %s" %(self.currency, self.ask, self.bid)
+        return "%s Ask: %s Bid: %s" % (self.currency, self.ask, self.bid)
 
 
 class DealModel(models.Model):
@@ -36,6 +40,14 @@ class DealModel(models.Model):
     result = models.DecimalField(null=True, max_digits=6, decimal_places=5)
 
     def __str__(self):
-        return "%s, %s, %s" %(self.sell_or_buy, self.ask, self.bid)
+        return "%s, %s, %s" % (self.sell_or_buy, self.ask, self.bid)
 
 
+class Profile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    date_of_birth = models.DateField(blank=True, null=True)
+    photo = models.ImageField(upload_to='users/%Y/%m/%d',
+                              blank=True)
+
+    def __str__(self):
+        return 'Profil użytkownika {}.'.format(self.user.username)
