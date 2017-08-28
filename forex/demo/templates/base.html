@@ -1,62 +1,44 @@
 <!DOCTYPE html>
+{% load staticfiles %}
 <html>
-    <head>
-        <title>{% block title %}Forex training{% endblock %}</title>
-    </head>
-    <body>
-        {% block content %}
-        <H2>Forex Training Platform</H2>
-            <div>
-                <iframe
-                        id = "frame"
-                        src="http://webrates.truefx.com/rates/webWidget/trfxhp.jsp?l=w"
-                        width="100%"
-                        height="400"
-                        frameborder="0">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div id="header">
+        <span class="logo">Bookmarks</span>
+        {% if request.user.is_authenticated %}
+        <ul class="menu">
+            <li {% if section == "dashboard" %}class="selected"{% endif %}><a href="{% url "dashboard" %}">My dashboard</a></li>
+            <li {% if section == "images" %}class="selected"{% endif %}><a href="#">Images</a></li>
+            <li {% if section == "people" %}class="selected"{% endif %}><a href="#">People</a></li>
+        </ul>
+        {% endif %}
 
-                </iframe>
-            </div>
-            <div>
-                <form action="" method="POST">
-                <select>
-                    <option value="EUR/USD">EUR/USD</option>
-                    <option value="USD/JPY">USD/JPY</option>
-                    <option value="GPB/USD">GPB/USD</option>
-                    <option value="USD/CHF">USD/CHF</option>
-                    <option value="EUR/JPY">EUR/JPY</option>
-                    <option value="EUR/CHF">EUR/CHF</option>
-                    <option value="USD/CAD">USD/CAD</option>
-                    <option value="AUD/USD">AUD/USD</option>
-                </select>
-                    {% csrf_token %}
-                    <button type="submit" name=BUY value="buy">BUY</button>
-                    <button type="submit" name=SELL value="sell">SELL</button>
-                </form>
-            </div>
-            <div>
-                <h3>
-                    {{answear}}
-                </h3>
-            </div>
-            <div>
-                <h3>Open transactions</h3>
-                    <p>
-                    {% for transaction in transactions_open %}
-                    {{ transaction.id }} {{transaction.timestamp}} {{ transaction.currency }} {{ transaction.sell_or_buy }} {{ transaction.bid }} {{ transaction.date_add }}
-                    <form action="" method="POST">
-                    {% csrf_token %}
-                         <button type="submit" name={{ transaction.id }} value="close">Close</button>
-                    </form>
-                    </p>
-                    {% endfor %}
-                <h3>Closed transactions</h3>
-                    <p>
-                    {% for transaction in transactions_closed %}
-                    {{ transaction.id }} {{ transaction.currency }} {{ transaction.sell_or_buy }} {{ transaction.bid }} {{ transaction.date_add }}
-                        {% csrf_token %}
-                    </p>
-                    {% endfor %}
-            </div>
+        <span class="user">
+        {% if request.user.is_authenticated %}
+            Hello {{ request.user.first_name }}, <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Log-in</a>
+        {% endif %}
+        </span>
+    </div>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{ message|safe }}
+                    <a href="#" class="close">×</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div id="content">
+        {% block content %}
         {% endblock %}
-    </body>
+    </div>
+</body>
 </html>

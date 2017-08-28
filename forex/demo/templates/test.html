@@ -17,6 +17,10 @@
 
     <link rel='stylesheet' href="{% static 'dist/css/bootstrap.min.css' %}" type='text/css'>
 
+    <!-- Django By Example CSS -->
+
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{% static 'docs/assets/css/ie10-viewport-bug-workaround.css' %}" rel='stylesheet'>
 
@@ -52,9 +56,19 @@
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="active"><a href="#">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="#about">News</a></li>
+                <li>{% if request.user.is_authenticated %}<a href="#contact">Account</a></li>
+                    {% else %}
+                <li><a href="{% url 'register' %}">Register</a></li>
+                    {% endif %}
+                <li>{% if request.user.is_authenticated %} <a href="{% url 'edit' %}">Hello {{ request.user.first_name }}</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+                    {% else %}
+                <li><a href="{% url 'login' %}">Log-in</a></li>
+                    {% endif %}
             </ul>
+
+
         </div><!--/.nav-collapse -->
     </div>
 </nav>
@@ -67,37 +81,28 @@
             on real, dealable interbank prices of forex major currency pairs.</p>
     </div>
 
-    <div class="starter-template">
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{ message|safe }}
+                    <a href="#" class="close">×</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %
+
+    <div class="content">
         {% block content %}
         {% endblock %}
     </div>
 
     <div>
-        <iframe
-                id="frame"
-                src="http://webrates.truefx.com/rates/webWidget/trfxhp.jsp?l=w"
-                width="100%"
-                height="400"
-                frameborder="0">
-        </iframe>
+
     </div>
 
     <div>
-        <form action="" method="POST">
-            <select>
-                <option value="EUR/USD">EUR/USD</option>
-                <option value="USD/JPY">USD/JPY</option>
-                <option value="GPB/USD">GPB/USD</option>
-                <option value="USD/CHF">USD/CHF</option>
-                <option value="EUR/JPY">EUR/JPY</option>
-                <option value="EUR/CHF">EUR/CHF</option>
-                <option value="USD/CAD">USD/CAD</option>
-                <option value="AUD/USD">AUD/USD</option>
-            </select>
-            {% csrf_token %}
-            <button type="submit" name=BUY value="buy">BUY</button>
-            <button type="submit" name=SELL value="sell">SELL</button>
-        </form>
+
     </div>
 
 </div><!-- /.container -->
