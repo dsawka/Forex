@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 
 class EmailAuthBackend(object):
     """
-    Uwierzytelnia użytkownika na podstawie adresu e-mail.
+    Authenticate using e-mail account.
     """
     def authenticate(self, username=None, password=None):
         try:

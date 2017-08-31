@@ -15,7 +15,7 @@ Including another URLconf
 """
 from demo import views
 from django.contrib.auth import views as auth_views
-from demo.views import MainView, TestView
+from demo.views import MainView, TestView, ChartsView
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
@@ -23,13 +23,14 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', MainView.as_view()),
+    url(r'^$', MainView.as_view(), name='home'),
     url(r'^test$', TestView.as_view()),
+    url(r'^charts', ChartsView.as_view(), name='charts'),
     url(r'^account/', include('demo.urls')),
     # Social authentication
     # url('social-auth/', include(social.apps.django_app.urls, namespace='social')),
 ]
-#
-# if settings.DEBUG:
-#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

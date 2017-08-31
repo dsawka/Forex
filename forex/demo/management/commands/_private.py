@@ -4,6 +4,7 @@ from demo.models import DataModel
 from forex.settings import *
 
 
+# This function is getting data from website as HTML and parsing it.
 def get_data():
     http = urllib3.PoolManager()
     while True:
@@ -23,14 +24,14 @@ def get_data():
         a = a[1:-1]
         sk = list[3]
         sk = str(sk[1:-1])
-        ask = float(a+sk)
+        ask = float(a + sk)
         print('Ask: {}'.format(ask))
 
         bi = list[4]
         bi = bi[1:-1]
         d = list[5]
         d = str(d[1:-1])
-        bid = float(bi+d)
+        bid = float(bi + d)
         print('Bid: {}'.format(bid))
 
         low = list[6]
@@ -44,7 +45,7 @@ def get_data():
         open = list[8]
         open = float(open[1:-1])
         print('Open: {}'.format(open))
-        # new_data = Data.objects.create(currency=currency1, timestamp=timestamp, ask=ask, bid=bid, low=low, high=high, open=open)
+
         new_data = {
             'currency': currency1,
             'timestamp': timestamp,
@@ -56,5 +57,3 @@ def get_data():
         }
         DataModel.objects.create(**new_data)
         time.sleep(60)
-
-# get_data()

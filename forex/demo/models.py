@@ -27,6 +27,7 @@ class DataModel(models.Model):
 
 
 class DealModel(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     sell_or_buy = models.CharField(max_length=16, choices=SELL_OR_BUY, null=True)
     date_add = models.DateTimeField(auto_now_add=True, db_index=True)
     open_or_closed = models.CharField(max_length=16, choices=OPEN_OR_CLOSED, default='Open')

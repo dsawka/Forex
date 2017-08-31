@@ -165,3 +165,9 @@ def edit(request):
                   'account/edit.html',
                   {'user_form': user_form,
                    'profile_form': profile_form})
+
+
+class ChartsView(View):
+    def get(self, request):
+        return TemplateResponse(request, 'charts.html')
+
