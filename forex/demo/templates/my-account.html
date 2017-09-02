@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}My account{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3>Open transactions</h3>
+    <p>
+        {% for transaction in transactions_open %}
+        {{ transaction.id }} {{transaction.timestamp}} {{ transaction.currency }} {{ transaction.sell_or_buy }} {{ transaction.bid }} {{ transaction.date_add }}
+    <form action="" method="POST">
+        {% csrf_token %}
+        <button type="submit" name={{ transaction.id }} value="close">Close</button>
+    </form>
+    </p>
+    {% endfor %}
+    <h3>Closed transactions</h3>
+    <p>
+        {% for transaction in transactions_closed %}
+        {{ transaction.id }} {{ transaction.currency }} {{ transaction.sell_or_buy }} {{ transaction.bid }} {{ transaction.date_add }}
+        {% csrf_token %}
+    </p>
+    {% endfor %}
+</div>
+
+{% endblock %}

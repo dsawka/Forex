@@ -11,14 +11,14 @@ from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditFor
 from django.contrib import messages
 
 
-class MainView(View):
+class MyAccountView(View):
     def get(self, request):
 
         transactions_open = DealModel.objects.filter(open_or_closed='OPEN')
         transactions_closed = DealModel.objects.filter(open_or_closed='CLOSED')
         content_dict = {'transactions_open': transactions_open,
                         'transactions_closed': transactions_closed}
-        return TemplateResponse(request, 'base.html', content_dict)
+        return TemplateResponse(request, 'my-account.html', content_dict)
 
     def post(self, request):
 
@@ -50,7 +50,7 @@ class MainView(View):
             DealModel.objects.create(**new_deal)
             content_dict['answear'] = "Buy %s by %s!" % (deal.currency, deal.bid)
 
-            return render(request, 'base.html', content_dict)
+            return render(request, 'my-account.html', content_dict)
 
         elif request.POST.get('SELL') == 'sell':
             new_deal = {
@@ -65,7 +65,7 @@ class MainView(View):
             }
             DealModel.objects.create(**new_deal)
             content_dict['answear'] = "Sell %s by %s!" % (deal.currency, deal.ask)
-            return TemplateResponse(request, 'base.html', content_dict)
+            return TemplateResponse(request, 'my-account.html', content_dict)
 
         elif request.POST.get(deal_id) == 'close':
             closing_deal = DealModel.objects.get(id=deal_id)
@@ -81,12 +81,12 @@ class MainView(View):
                 closing_deal.save()
 
             content_dict['answear'] = "Closed!!!"
-            return TemplateResponse(request, 'base.html', content_dict)
+            return TemplateResponse(request, 'my-account.html', content_dict)
 
         else:
             content_dict['answear'] = "Error!"
             print(vars(request))
-            return TemplateResponse(request, 'base.html', content_dict)
+            return TemplateResponse(request, 'my-account.html', content_dict)
 
 
 class TestView(View):
@@ -167,7 +167,11 @@ def edit(request):
                    'profile_form': profile_form})
 
 
+class IndexView(View):
+    def get(self, request):
+        return TemplateResponse(request, 'index.html')
+
+
 class ChartsView(View):
     def get(self, request):
         return TemplateResponse(request, 'charts.html')
-
