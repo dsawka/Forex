@@ -17,7 +17,7 @@ from django.contrib.auth.decorators import login_required
 
 from demo import views
 from django.contrib.auth import views as auth_views
-from demo.views import TestView, ChartsView, IndexView, MyAccountView
+from demo.views import TestView, ChartsView, IndexView, MyAccountView, CalendarView
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^test/', TestView.as_view()),
     url(r'^index/', IndexView.as_view(), name='index'),
     url(r'^charts/', ChartsView.as_view(), name='charts'),
+    url(r'^calendar/', CalendarView.as_view(), name='calendar'),
     url(r'^account/', include('demo.urls')),
     # Social authentication
     # url('social-auth/', include(social.apps.django_app.urls, namespace='social')),
