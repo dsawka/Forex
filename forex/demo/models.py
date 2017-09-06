@@ -10,7 +10,10 @@ OPEN_OR_CLOSED = (
     ('Open', 'OPEN'),
     ('Closed', 'CLOSED')
 )
-
+CURRENCY = (
+    ('EUR', 'EUR'),
+    ('USD', 'USD')
+)
 
 class DataModel(models.Model):
     date_add = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -52,3 +55,12 @@ class Profile(models.Model):
 
     def __str__(self):
         return 'Profil użytkownika {}.'.format(self.user.username)
+
+
+class Account(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    currency = models.CharField(max_length=16, choices=CURRENCY, default='USD')
+    equity = models.DecimalField(max_digits=9, decimal_places=2, default=10000)
+
+    def __str__(self):
+        return "{}'s account" .format(self.user.username)
