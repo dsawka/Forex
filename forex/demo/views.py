@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -14,21 +15,28 @@ from django.contrib import messages
 class MyAccountView(View):
     def get(self, request):
 
+
         transactions_open = DealModel.objects.filter(open_or_closed='OPEN')
         transactions_closed = DealModel.objects.filter(open_or_closed='CLOSED')
+        profit = transactions_closed.aggregate(Sum('result'))
+        profit = profit.get('result__sum')
         content_dict = {'transactions_open': transactions_open,
-                        'transactions_closed': transactions_closed}
-        return TemplateResponse(request, 'my-account.html', content_dict)
+                        'transactions_closed': transactions_closed,
+                        'profit': profit
+                        }
+        return TemplateResponse(request, 'main/my-account.html', content_dict)
 
     def post(self, request):
 
         transactions_open = DealModel.objects.filter(open_or_closed='OPEN')
         transactions_closed = DealModel.objects.filter(open_or_closed='CLOSED')
+        profit = transactions_closed.aggregate(Sum('result'))
+        profit = profit.get('result__sum')
         deal = DataModel.objects.all().last()
 
-        content_dict = {'answear': '',
-                        'transactions_open': transactions_open,
-                        'transactions_closed': transactions_closed
+        content_dict = {'transactions_open': transactions_open,
+                        'transactions_closed': transactions_closed,
+                        'profit': profit
                         }
 
         if 'close' in request.POST.values():
@@ -36,38 +44,7 @@ class MyAccountView(View):
                 if value == 'close':
                     deal_id = key
 
-        if request.POST.get('BUY') == 'buy':
-            new_deal = {
-                'sell_or_buy': 'buy',
-                'currency': deal.currency,
-                'timestamp': deal.timestamp,
-                'ask': deal.ask,
-                'bid': deal.bid,
-                'low': deal.low,
-                'high': deal.high,
-                'open': deal.open
-            }
-            DealModel.objects.create(**new_deal)
-            content_dict['answear'] = "Buy %s by %s!" % (deal.currency, deal.bid)
-
-            return render(request, 'my-account.html', content_dict)
-
-        elif request.POST.get('SELL') == 'sell':
-            new_deal = {
-                'sell_or_buy': 'sell',
-                'currency': deal.currency,
-                'timestamp': deal.timestamp,
-                'ask': deal.ask,
-                'bid': deal.bid,
-                'low': deal.low,
-                'high': deal.high,
-                'open': deal.open
-            }
-            DealModel.objects.create(**new_deal)
-            content_dict['answear'] = "Sell %s by %s!" % (deal.currency, deal.ask)
-            return TemplateResponse(request, 'my-account.html', content_dict)
-
-        elif request.POST.get(deal_id) == 'close':
+        if request.POST.get(deal_id) == 'close':
             closing_deal = DealModel.objects.get(id=deal_id)
             closing_deal.open_or_closed = 'Closed'
             closing_deal.save()
@@ -81,12 +58,12 @@ class MyAccountView(View):
                 closing_deal.save()
 
             content_dict['answear'] = "Closed!!!"
-            return TemplateResponse(request, 'my-account.html', content_dict)
+            return TemplateResponse(request, 'main/my-account.html', content_dict)
 
         else:
             content_dict['answear'] = "Error!"
             print(vars(request))
-            return TemplateResponse(request, 'my-account.html', content_dict)
+            return TemplateResponse(request, 'main/my-account.html', content_dict)
 
 
 class TestView(View):
@@ -150,7 +127,7 @@ def edit(request):
 
 class IndexView(View):
     def get(self, request):
-        return TemplateResponse(request, 'index.html')
+        return TemplateResponse(request, 'main/index.html')
 
     def post(self, request):
 
@@ -182,7 +159,7 @@ class IndexView(View):
             DealModel.objects.create(**new_deal)
             content_dict['answear'] = "Buy %s by %s!" % (deal.currency, deal.bid)
 
-            return render(request, 'my-account.html', content_dict)
+            return render(request, 'main/my-account.html', content_dict)
 
         elif request.POST.get('SELL') == 'sell':
             new_deal = {
@@ -197,7 +174,7 @@ class IndexView(View):
             }
             DealModel.objects.create(**new_deal)
             content_dict['answear'] = "Sell %s by %s!" % (deal.currency, deal.ask)
-            return TemplateResponse(request, 'my-account.html', content_dict)
+            return TemplateResponse(request, 'main/my-account.html', content_dict)
 
         elif request.POST.get(deal_id) == 'close':
             closing_deal = DealModel.objects.get(id=deal_id)
@@ -213,18 +190,18 @@ class IndexView(View):
                 closing_deal.save()
 
             content_dict['answear'] = "Closed!!!"
-            return TemplateResponse(request, 'my-account.html', content_dict)
+            return TemplateResponse(request, 'main/my-account.html', content_dict)
 
         else:
             content_dict['answear'] = "Error!"
             print(vars(request))
-            return TemplateResponse(request, 'my-account.html', content_dict)
+            return TemplateResponse(request, 'main/my-account.html', content_dict)
 
 
 
 class ChartsView(View):
     def get(self, request):
-        return TemplateResponse(request, 'charts.html')
+        return TemplateResponse(request, 'main/charts.html')
 
     def post(self, request):
 
@@ -256,7 +233,7 @@ class ChartsView(View):
             DealModel.objects.create(**new_deal)
             content_dict['answear'] = "Buy %s by %s!" % (deal.currency, deal.bid)
 
-            return render(request, 'my-account.html', content_dict)
+            return render(request, 'main/my-account.html', content_dict)
 
         elif request.POST.get('SELL') == 'sell':
             new_deal = {
@@ -271,7 +248,7 @@ class ChartsView(View):
             }
             DealModel.objects.create(**new_deal)
             content_dict['answear'] = "Sell %s by %s!" % (deal.currency, deal.ask)
-            return TemplateResponse(request, 'my-account.html', content_dict)
+            return TemplateResponse(request, 'main/my-account.html', content_dict)
 
         elif request.POST.get(deal_id) == 'close':
             closing_deal = DealModel.objects.get(id=deal_id)
@@ -287,14 +264,14 @@ class ChartsView(View):
                 closing_deal.save()
 
             content_dict['answear'] = "Closed!!!"
-            return TemplateResponse(request, 'my-account.html', content_dict)
+            return TemplateResponse(request, 'main/my-account.html', content_dict)
 
         else:
             content_dict['answear'] = "Error!"
             print(vars(request))
-            return TemplateResponse(request, 'my-account.html', content_dict)
+            return TemplateResponse(request, 'main/my-account.html', content_dict)
 
 
 class CalendarView(View):
     def get(self, request):
-        return TemplateResponse(request, 'calendar.html')
+        return TemplateResponse(request, 'main/calendar.html')

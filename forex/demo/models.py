@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-
 SELL_OR_BUY = (
     ('sell', 'sell'),
     ('buy', 'buy')
@@ -14,6 +13,7 @@ CURRENCY = (
     ('EUR', 'EUR'),
     ('USD', 'USD')
 )
+
 
 class DataModel(models.Model):
     date_add = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -54,7 +54,7 @@ class Profile(models.Model):
                               blank=True)
 
     def __str__(self):
-        return 'Profil użytkownika {}.'.format(self.user.username)
+        return 'Profile of {}.'.format(self.user.username)
 
 
 class Account(models.Model):
@@ -63,4 +63,4 @@ class Account(models.Model):
     equity = models.DecimalField(max_digits=9, decimal_places=2, default=10000)
 
     def __str__(self):
-        return "{}'s account" .format(self.user.username)
+        return "{}'s account".format(self.user.username)

@@ -25,11 +25,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^my-account/', login_required(MyAccountView.as_view()), name='my-account'),
+    url(r'^my-account/$', login_required(MyAccountView.as_view()), name='my-account'),
     url(r'^test/', TestView.as_view()),
-    url(r'^index/', IndexView.as_view(), name='index'),
-    url(r'^charts/', ChartsView.as_view(), name='charts'),
-    url(r'^calendar/', CalendarView.as_view(), name='calendar'),
+    url(r'^$', IndexView.as_view(), name='index'),
+    url(r'^charts/$', ChartsView.as_view(), name='charts'),
+    url(r'^calendar/$', CalendarView.as_view(), name='calendar'),
     url(r'^account/', include('demo.urls')),
     # Social authentication
     # url('social-auth/', include(social.apps.django_app.urls, namespace='social')),
