@@ -13,7 +13,7 @@ class DataModelAdmin(admin.ModelAdmin):
 @admin.register(DealModel)
 class DealModelAdmin(admin.ModelAdmin):
     list_display = ('currency', 'date_add', 'open_or_closed', 'sell_or_buy', 'timestamp',
-                    'ask', 'bid', 'low', 'high', 'open', 'result', 'user')
+                    'ask', 'bid','date_close', 'result', 'user')
 
 
 @admin.register(Profile)

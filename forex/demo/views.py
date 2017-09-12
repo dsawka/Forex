@@ -30,13 +30,12 @@ class MyAccountView(View):
 
         transactions_open = DealModel.objects.filter(open_or_closed='OPEN')
         transactions_closed = DealModel.objects.filter(open_or_closed='CLOSED')
-        profit = transactions_closed.aggregate(Sum('result'))
-        profit = profit.get('result__sum')
+
         deal = DataModel.objects.all().last()
 
         content_dict = {'transactions_open': transactions_open,
                         'transactions_closed': transactions_closed,
-                        'profit': profit
+                        'profit': ''
                         }
 
         if 'close' in request.POST.values():
@@ -57,7 +56,14 @@ class MyAccountView(View):
                 closing_deal.result = result
                 closing_deal.save()
 
-            content_dict['answear'] = "Closed!!!"
+            profit = transactions_closed.aggregate(Sum('result'))
+            profit = profit.get('result__sum')
+            print(profit)
+            profit_usd = profit * 100000
+            content_dict ['profit'] = profit_usd
+            print(profit_usd)
+
+            # content_dict['answear'] = "Closed!!!"
             return TemplateResponse(request, 'main/my-account.html', content_dict)
 
         else:

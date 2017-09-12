@@ -33,7 +33,9 @@
         <tr>
             <th>SYMBOL</th>
             <th>TYPE</th>
-            <th>TIME</th>
+            <th>TIME OPEN</th>
+            <th>PRICE</th>
+            <th>TIME CLOSE</th>
             <th>PRICE</th>
             <th>PROFIT</th>
         </tr>
@@ -43,9 +45,13 @@
             <td>{{ transaction.sell_or_buy }}</td>
             <td>{{ transaction.date_add }}</td>
             <td>{{ transaction.bid }} </td>
+            <td>{{transaction.date_close}}</td>
+            <td>{{closing_deal.ask}}</td>
             <td>{{ transaction.result }} </td>
         </tr>
             {% endfor %}
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
