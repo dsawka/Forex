@@ -20,19 +20,19 @@ def get_data():
         timestamp = (int(timestamp[1:-1]))
         print('Timestamp: {}'.format(timestamp))
 
-        a = list[2]
-        a = a[1:-1]
-        sk = list[3]
-        sk = str(sk[1:-1])
-        ask = float(a + sk)
-        print('Ask: {}'.format(ask))
-
-        bi = list[4]
+        bi = list[2]
         bi = bi[1:-1]
-        d = list[5]
+        d = list[3]
         d = str(d[1:-1])
         bid = float(bi + d)
         print('Bid: {}'.format(bid))
+
+        a = list[4]
+        a = a[1:-1]
+        sk = list[5]
+        sk = str(sk[1:-1])
+        ask = float(a + sk)
+        print('Ask: {}'.format(ask))
 
         low = list[6]
         low = float(low[1:-1])
@@ -49,8 +49,8 @@ def get_data():
         new_data = {
             'currency': currency1,
             'timestamp': timestamp,
-            'ask': ask,
             'bid': bid,
+            'ask': ask,
             'low': low,
             'high': high,
             'open': open

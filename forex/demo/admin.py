@@ -7,13 +7,13 @@ from .models import DataModel, DealModel, Profile, Account
 
 @admin.register(DataModel)
 class DataModelAdmin(admin.ModelAdmin):
-    list_display = ('currency', 'date_add', 'timestamp', 'ask', 'bid', 'low', 'high', 'open')
+    list_display = ('currency', 'date_add', 'timestamp', 'bid', 'ask', 'low', 'high', 'open')
 
 
 @admin.register(DealModel)
 class DealModelAdmin(admin.ModelAdmin):
     list_display = ('currency', 'date_add', 'open_or_closed', 'sell_or_buy', 'timestamp',
-                    'ask', 'bid','date_close', 'result', 'user')
+                    'bid', 'ask','date_close', 'result', 'user')
 
 
 @admin.register(Profile)

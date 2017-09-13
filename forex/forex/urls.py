@@ -17,7 +17,7 @@ from django.contrib.auth.decorators import login_required
 
 from demo import views
 from django.contrib.auth import views as auth_views
-from demo.views import TestView, ChartsView, IndexView, MyAccountView, CalendarView
+from demo.views import ChartsView, IndexView, MyAccountView, CalendarView
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
@@ -26,7 +26,6 @@ from django.conf.urls.static import static
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^my-account/$', login_required(MyAccountView.as_view()), name='my-account'),
-    url(r'^test/', TestView.as_view()),
     url(r'^$', IndexView.as_view(), name='index'),
     url(r'^charts/$', ChartsView.as_view(), name='charts'),
     url(r'^calendar/$', CalendarView.as_view(), name='calendar'),

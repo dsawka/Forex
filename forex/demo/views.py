@@ -1,43 +1,129 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.contrib.auth import authenticate, login
 from django.template.response import TemplateResponse
 from django.views import View
-import urllib3, time
 from demo.models import DataModel, DealModel, Profile
-from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
+from .forms import UserRegistrationForm, UserEditForm, ProfileEditForm
 from django.contrib import messages
+from django.urls import reverse
+
+class IndexView(View):
+    def get(self, request):
+
+        return TemplateResponse(request, 'main/index.html')
+
+    def post(self, request):
+
+        deal = DataModel.objects.all().last()
+        if request.user.is_authenticated:
+
+            if request.POST.get('BUY') == 'buy':
+                new_deal = {
+                    'user': request.user,
+                    'sell_or_buy': 'buy',
+                    'currency': deal.currency,
+                    'timestamp': deal.timestamp,
+                    'bid': deal.bid,
+                    'ask': deal.ask,
+                    'low': deal.low,
+                    'high': deal.high,
+                    'open': deal.open
+                }
+                DealModel.objects.create(**new_deal)
+                return HttpResponseRedirect(reverse('my-account'))
+
+            else:
+                request.POST.get('SELL') == 'sell'
+                new_deal = {
+                    'user': request.user,
+                    'sell_or_buy': 'sell',
+                    'currency': deal.currency,
+                    'timestamp': deal.timestamp,
+                    'bid': deal.bid,
+                    'ask': deal.ask,
+                    'low': deal.low,
+                    'high': deal.high,
+                    'open': deal.open
+                }
+                DealModel.objects.create(**new_deal)
+                return HttpResponseRedirect(reverse('my-account'))
+        else:
+            return HttpResponseRedirect(reverse('login'))
+
+class ChartsView(View):
+
+    def get(self, request):
+        return TemplateResponse(request, 'main/charts.html')
+
+    def post(self, request):
+
+        deal = DataModel.objects.all().last()
+        if request.user.is_authenticated:
+
+            if request.POST.get('BUY') == 'buy':
+                new_deal = {
+                    'user': request.user,
+                    'sell_or_buy': 'buy',
+                    'currency': deal.currency,
+                    'timestamp': deal.timestamp,
+                    'bid': deal.bid,
+                    'ask': deal.ask,
+                    'low': deal.low,
+                    'high': deal.high,
+                    'open': deal.open
+                }
+                DealModel.objects.create(**new_deal)
+                return HttpResponseRedirect(reverse('my-account'))
+
+            else:
+                request.POST.get('SELL') == 'sell'
+                new_deal = {
+                    'user': request.user,
+                    'sell_or_buy': 'sell',
+                    'currency': deal.currency,
+                    'timestamp': deal.timestamp,
+                    'bid': deal.bid,
+                    'ask': deal.ask,
+                    'low': deal.low,
+                    'high': deal.high,
+                    'open': deal.open
+                }
+                DealModel.objects.create(**new_deal)
+                return HttpResponseRedirect(reverse('my-account'))
+        else:
+            return HttpResponseRedirect(reverse('login'))
+
+
+class CalendarView(View):
+    def get(self, request):
+        return TemplateResponse(request, 'main/calendar.html')
 
 
 class MyAccountView(View):
     def get(self, request):
 
-
-        transactions_open = DealModel.objects.filter(open_or_closed='OPEN')
-        transactions_closed = DealModel.objects.filter(open_or_closed='CLOSED')
+        transactions_open = DealModel.objects.filter(user=request.user, open_or_closed='OPEN')
+        transactions_closed = DealModel.objects.filter(user= request.user, open_or_closed='CLOSED')
         profit = transactions_closed.aggregate(Sum('result'))
         profit = profit.get('result__sum')
+        profit_usd = profit * 100000
         content_dict = {'transactions_open': transactions_open,
                         'transactions_closed': transactions_closed,
-                        'profit': profit
+                        'profit': profit_usd
                         }
         return TemplateResponse(request, 'main/my-account.html', content_dict)
 
     def post(self, request):
 
-        transactions_open = DealModel.objects.filter(open_or_closed='OPEN')
-        transactions_closed = DealModel.objects.filter(open_or_closed='CLOSED')
-
+        transactions_open = DealModel.objects.filter(user=request.user, open_or_closed='OPEN')
+        transactions_closed = DealModel.objects.filter(user=request.user, open_or_closed='CLOSED')
         deal = DataModel.objects.all().last()
-
         content_dict = {'transactions_open': transactions_open,
                         'transactions_closed': transactions_closed,
                         'profit': ''
                         }
-
         if 'close' in request.POST.values():
             for key, value in request.POST.items():
                 if value == 'close':
@@ -48,33 +134,24 @@ class MyAccountView(View):
             closing_deal.open_or_closed = 'Closed'
             closing_deal.save()
             if closing_deal.sell_or_buy == 'sell':
-                result = closing_deal.ask - deal.bid
+                result = closing_deal.bid - deal.ask
                 closing_deal.result = result
                 closing_deal.save()
             if closing_deal.sell_or_buy == 'buy':
-                result = deal.ask - closing_deal.bid
+                result = deal.bid - closing_deal.ask
                 closing_deal.result = result
                 closing_deal.save()
 
             profit = transactions_closed.aggregate(Sum('result'))
             profit = profit.get('result__sum')
-            print(profit)
             profit_usd = profit * 100000
             content_dict ['profit'] = profit_usd
-            print(profit_usd)
-
-            # content_dict['answear'] = "Closed!!!"
             return TemplateResponse(request, 'main/my-account.html', content_dict)
 
         else:
             content_dict['answear'] = "Error!"
             print(vars(request))
             return TemplateResponse(request, 'main/my-account.html', content_dict)
-
-
-class TestView(View):
-    def get(self, request):
-        return TemplateResponse(request, 'test.html')
 
 
 @login_required
@@ -96,7 +173,7 @@ def register(request):
             # Zapisanie obiektu User.
             new_user.save()
             # Utworzenie profilu użytkownika.
-            profile = Profile.objects.create(user=new_user)
+            Profile.objects.create(user=new_user)
             return render(request,
                           'account/register_done.html',
                           {'new_user': new_user})
@@ -131,153 +208,7 @@ def edit(request):
                    'profile_form': profile_form})
 
 
-class IndexView(View):
-    def get(self, request):
-        return TemplateResponse(request, 'main/index.html')
-
-    def post(self, request):
-
-        transactions_open = DealModel.objects.filter(open_or_closed='OPEN')
-        transactions_closed = DealModel.objects.filter(open_or_closed='CLOSED')
-        deal = DataModel.objects.all().last()
-
-        content_dict = {'answear': '',
-                        'transactions_open': transactions_open,
-                        'transactions_closed': transactions_closed
-                        }
-
-        if 'close' in request.POST.values():
-            for key, value in request.POST.items():
-                if value == 'close':
-                    deal_id = key
-
-        if request.POST.get('BUY') == 'buy':
-            new_deal = {
-                'sell_or_buy': 'buy',
-                'currency': deal.currency,
-                'timestamp': deal.timestamp,
-                'ask': deal.ask,
-                'bid': deal.bid,
-                'low': deal.low,
-                'high': deal.high,
-                'open': deal.open
-            }
-            DealModel.objects.create(**new_deal)
-            content_dict['answear'] = "Buy %s by %s!" % (deal.currency, deal.bid)
-
-            return render(request, 'main/my-account.html', content_dict)
-
-        elif request.POST.get('SELL') == 'sell':
-            new_deal = {
-                'sell_or_buy': 'sell',
-                'currency': deal.currency,
-                'timestamp': deal.timestamp,
-                'ask': deal.ask,
-                'bid': deal.bid,
-                'low': deal.low,
-                'high': deal.high,
-                'open': deal.open
-            }
-            DealModel.objects.create(**new_deal)
-            content_dict['answear'] = "Sell %s by %s!" % (deal.currency, deal.ask)
-            return TemplateResponse(request, 'main/my-account.html', content_dict)
-
-        elif request.POST.get(deal_id) == 'close':
-            closing_deal = DealModel.objects.get(id=deal_id)
-            closing_deal.open_or_closed = 'Closed'
-            closing_deal.save()
-            if closing_deal.sell_or_buy == 'sell':
-                result = closing_deal.ask - deal.bid
-                closing_deal.result = result
-                closing_deal.save()
-            if closing_deal.sell_or_buy == 'buy':
-                result = deal.ask - closing_deal.bid
-                closing_deal.result = result
-                closing_deal.save()
-
-            content_dict['answear'] = "Closed!!!"
-            return TemplateResponse(request, 'main/my-account.html', content_dict)
-
-        else:
-            content_dict['answear'] = "Error!"
-            print(vars(request))
-            return TemplateResponse(request, 'main/my-account.html', content_dict)
 
 
 
-class ChartsView(View):
-    def get(self, request):
-        return TemplateResponse(request, 'main/charts.html')
 
-    def post(self, request):
-
-        transactions_open = DealModel.objects.filter(open_or_closed='OPEN')
-        transactions_closed = DealModel.objects.filter(open_or_closed='CLOSED')
-        deal = DataModel.objects.all().last()
-
-        content_dict = {'answear': '',
-                        'transactions_open': transactions_open,
-                        'transactions_closed': transactions_closed
-                        }
-
-        if 'close' in request.POST.values():
-            for key, value in request.POST.items():
-                if value == 'close':
-                    deal_id = key
-
-        if request.POST.get('BUY') == 'buy':
-            new_deal = {
-                'sell_or_buy': 'buy',
-                'currency': deal.currency,
-                'timestamp': deal.timestamp,
-                'ask': deal.ask,
-                'bid': deal.bid,
-                'low': deal.low,
-                'high': deal.high,
-                'open': deal.open
-            }
-            DealModel.objects.create(**new_deal)
-            content_dict['answear'] = "Buy %s by %s!" % (deal.currency, deal.bid)
-
-            return render(request, 'main/my-account.html', content_dict)
-
-        elif request.POST.get('SELL') == 'sell':
-            new_deal = {
-                'sell_or_buy': 'sell',
-                'currency': deal.currency,
-                'timestamp': deal.timestamp,
-                'ask': deal.ask,
-                'bid': deal.bid,
-                'low': deal.low,
-                'high': deal.high,
-                'open': deal.open
-            }
-            DealModel.objects.create(**new_deal)
-            content_dict['answear'] = "Sell %s by %s!" % (deal.currency, deal.ask)
-            return TemplateResponse(request, 'main/my-account.html', content_dict)
-
-        elif request.POST.get(deal_id) == 'close':
-            closing_deal = DealModel.objects.get(id=deal_id)
-            closing_deal.open_or_closed = 'Closed'
-            closing_deal.save()
-            if closing_deal.sell_or_buy == 'sell':
-                result = closing_deal.ask - deal.bid
-                closing_deal.result = result
-                closing_deal.save()
-            if closing_deal.sell_or_buy == 'buy':
-                result = deal.ask - closing_deal.bid
-                closing_deal.result = result
-                closing_deal.save()
-
-            content_dict['answear'] = "Closed!!!"
-            return TemplateResponse(request, 'main/my-account.html', content_dict)
-
-        else:
-            content_dict['answear'] = "Error!"
-            print(vars(request))
-            return TemplateResponse(request, 'main/my-account.html', content_dict)
-
-
-class CalendarView(View):
-    def get(self, request):
-        return TemplateResponse(request, 'main/calendar.html')
