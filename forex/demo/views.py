@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.views import View
-from demo.models import DataModel, DealModel, Profile
+from demo.models import DataModel, DealModel, Profile, Account
 from .forms import UserRegistrationForm, UserEditForm, ProfileEditForm
 from django.contrib import messages
 from django.urls import reverse
@@ -34,8 +34,7 @@ class IndexView(View):
                 DealModel.objects.create(**new_deal)
                 return HttpResponseRedirect(reverse('my-account'))
 
-            else:
-                request.POST.get('SELL') == 'sell'
+            elif request.POST.get('SELL') == 'sell':
                 new_deal = {
                     'user': request.user,
                     'sell_or_buy': 'sell',
@@ -77,8 +76,7 @@ class ChartsView(View):
                 DealModel.objects.create(**new_deal)
                 return HttpResponseRedirect(reverse('my-account'))
 
-            else:
-                request.POST.get('SELL') == 'sell'
+            elif request.POST.get('SELL') == 'sell':
                 new_deal = {
                     'user': request.user,
                     'sell_or_buy': 'sell',
@@ -105,13 +103,17 @@ class MyAccountView(View):
     def get(self, request):
 
         transactions_open = DealModel.objects.filter(user=request.user, open_or_closed='OPEN')
-        transactions_closed = DealModel.objects.filter(user= request.user, open_or_closed='CLOSED')
-        profit = transactions_closed.aggregate(Sum('result'))
-        profit = profit.get('result__sum')
-        profit_usd = profit * 100000
+        transactions_closed = DealModel.objects.filter(user=request.user, open_or_closed='CLOSED')
+        profit_pips = transactions_closed.aggregate(Sum('result'))
+        profit_pips = profit_pips.get('result__sum')
+        user_account = Account.objects.get(user=request.user)
+        if profit_pips is not None:
+            user_account.profit = profit_pips * 100000
+            user_account.save()
+        user_profit = user_account.profit
         content_dict = {'transactions_open': transactions_open,
                         'transactions_closed': transactions_closed,
-                        'profit': profit_usd
+                        'profit': user_profit
                         }
         return TemplateResponse(request, 'main/my-account.html', content_dict)
 
@@ -142,10 +144,14 @@ class MyAccountView(View):
                 closing_deal.result = result
                 closing_deal.save()
 
-            profit = transactions_closed.aggregate(Sum('result'))
-            profit = profit.get('result__sum')
-            profit_usd = profit * 100000
-            content_dict ['profit'] = profit_usd
+            profit_pips = transactions_closed.aggregate(Sum('result'))
+            profit_pips = profit_pips.get('result__sum')
+            user_account = Account.objects.get(user=request.user)
+            if profit_pips is not None:
+                user_account.profit = profit_pips * 100000
+                user_account.save()
+            user_profit = user_account.profit
+            content_dict ['profit'] = user_profit
             return TemplateResponse(request, 'main/my-account.html', content_dict)
 
         else:
@@ -173,6 +179,7 @@ def register(request):
             # Zapisanie obiektu User.
             new_user.save()
             # Utworzenie profilu użytkownika.
+            Account.objects.create(user=new_user)
             Profile.objects.create(user=new_user)
             return render(request,
                           'account/register_done.html',
